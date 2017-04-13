@@ -4,7 +4,7 @@
 
 This repository contains the demonstration of gRPC built by Kotlin. 
 
-`TODO` insert capture
+![demo](https://raw.githubusercontent.com/nsoushi/grpc-kotlin-test/master/docs/capture.png)
 
 ### Gateway Server
 
@@ -26,12 +26,12 @@ I want to try Spring Framework 5.0 and Reactor Programming on Kotlin and to know
 
 ## How to confirm the demo
 
-If `protoc` do not install, After execute following command then `protoc` is installed.
+At first If `protoc` do not install, After execute following command then `protoc` is installed.
 ```
 (grpc-kotlin-test) $ make deps
 ```
 
-Run both servers.
+Next run both servers.
 
 **Gateway Server**
 ```
@@ -42,6 +42,8 @@ Run both servers.
 ```
 (grpc-kotlin-testserver/grpc-grpc) $ ./gradlew clean generateProto bootRun
 ```
+
+---
 
 then confirm to request to `gRPC Server` via `Gateway Server`.
 ```
