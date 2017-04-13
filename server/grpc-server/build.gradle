@@ -1,0 +1,115 @@
+group 'grpc-server'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '1.1.1'
+    ext.springboot_version = "1.5.2.RELEASE"
+
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:$springboot_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
+        classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.1"
+    }
+}
+
+apply plugin: 'com.google.protobuf'
+apply plugin: 'java'
+apply plugin: 'kotlin'
+apply plugin: "kotlin-spring"
+apply plugin: "org.springframework.boot"
+apply plugin: 'application'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    jcenter()
+
+    maven { url "http://maven.springframework.org/milestone" }
+}
+
+processResources.destinationDir = compileJava.destinationDir
+compileJava.dependsOn processResources
+
+kapt {
+    generateStubs = false
+}
+
+sourceSets {
+    main.kotlin.srcDirs += 'src/main/kotlin'
+    main.java.srcDirs += 'src/main/java'
+    main.java.srcDirs += 'src/main/protoGen'
+}
+
+def grpcVersion = '1.2.0'
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    // grpc
+    compile "io.grpc:grpc-netty:${grpcVersion}"
+    compile "io.grpc:grpc-protobuf:${grpcVersion}"
+    compile "io.grpc:grpc-stub:${grpcVersion}"
+    compile "com.google.api.grpc:googleapis-common-protos:0.0.3"
+
+    // spring-boot
+    compile "org.springframework.boot:spring-boot-starter-web:$springboot_version"
+    compile "org.springframework.boot:spring-boot-actuator:$springboot_version"
+    compile "org.lognet:grpc-spring-boot-starter:2.0.1"
+
+    // test
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+protobuf {
+    protoc {
+        artifact = 'com.google.protobuf:protoc:3.2.0'
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}"
+        }
+    }
+    generateProtoTasks {
+        ofSourceSet('main').each { task ->
+            task.builtins {
+                java {
+                    outputSubDir = 'protoGen'
+                }
+            }
+            task.plugins {
+                grpc {
+                    outputSubDir = 'protoGen'
+                }
+            }
+        }
+    }
+    generatedFilesBaseDir = "$projectDir/src/"
+}
+
+idea {
+    module {
+        sourceDirs += file("${projectDir}/src/kotlin")
+        sourceDirs += file("${projectDir}/src/java")
+        sourceDirs += file("${projectDir}/src/protoGen")
+
+        inheritOutputDirs = false
+        outputDir = file("$buildDir/classes/main/")
+    }
+}
+
+startScripts.enabled = false
+
+task cleanProtoGen{
+    doFirst{
+        delete("$projectDir/src/main/protoGen")
+    }
+}
+clean.dependsOn cleanProtoGen
