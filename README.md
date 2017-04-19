@@ -40,7 +40,7 @@ Next run both servers.
 
 **gRPC Server**
 ```
-(grpc-kotlin-testserver/grpc-grpc) $ ./gradlew clean generateProto bootRun
+(grpc-kotlin-test/server/grpc-grpc) $ ./gradlew clean generateProto bootRun
 ```
 
 ---
